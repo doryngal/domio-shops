@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getShopSession, unauthorized } from "@/lib/session";
 
 export async function GET(_request: NextRequest) {
+  try {
   const session = await getShopSession();
   if (!session) return unauthorized();
 
@@ -58,7 +59,7 @@ export async function GET(_request: NextRequest) {
   const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
 
   const topProducts = topProductViews.map((p) => ({
-    product: productMap[p.product_id!],
+    product: productMap[p.product_id!] ?? null,
     views: Number(p._count.product_id),
   }));
 
@@ -84,4 +85,7 @@ export async function GET(_request: NextRequest) {
     topProducts,
     referrers: referrers.map((r) => ({ referrer: r.referrer, count: Number(r._count.referrer) })),
   });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

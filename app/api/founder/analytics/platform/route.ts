@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getFounderSession, unauthorized } from "@/lib/session";
 
 export async function GET(_request: NextRequest) {
+  try {
   const session = await getFounderSession();
   if (!session) return unauthorized();
 
@@ -61,4 +62,7 @@ export async function GET(_request: NextRequest) {
     })),
     shopGrowth: shopGrowth.map((s) => ({ month: s.month, count: Number(s.count) })),
   });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

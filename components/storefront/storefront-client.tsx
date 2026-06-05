@@ -25,6 +25,7 @@ interface Shop {
   whatsapp_number: string;
   instagram_url: string | null;
   theme: { accent: string; button_color: string; font: string };
+  whatsapp_template: string | null;
 }
 
 interface StorefrontClientProps {
@@ -79,6 +80,7 @@ export function StorefrontClient({ shop, initialProducts, categories }: Storefro
         shopSlug={shop.slug}
         whatsappNumber={shop.whatsapp_number}
         accentColor={accentColor}
+        whatsappTemplate={shop.whatsapp_template}
       />
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-5">

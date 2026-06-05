@@ -44,7 +44,9 @@ export function Sidebar({ items, shopName, logoHref = "/" }: SidebarProps) {
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
         {items.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active =
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}

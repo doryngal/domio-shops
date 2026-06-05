@@ -6,61 +6,73 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getShopSession();
-  if (!session) return unauthorized();
+  try {
+    const session = await getShopSession();
+    if (!session) return unauthorized();
 
-  const product = await prisma.product.findFirst({
-    where: { id: params.id, shop_id: session.shopId },
-  });
+    const product = await prisma.product.findFirst({
+      where: { id: params.id, shop_id: session.shopId },
+    });
 
-  if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(product);
+    if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(product);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getShopSession();
-  if (!session) return unauthorized();
+  try {
+    const session = await getShopSession();
+    if (!session) return unauthorized();
 
-  const existing = await prisma.product.findFirst({
-    where: { id: params.id, shop_id: session.shopId },
-  });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const existing = await prisma.product.findFirst({
+      where: { id: params.id, shop_id: session.shopId },
+    });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const body = await request.json();
-  const { name, description, price, images, category, in_stock, is_active, sort_order } = body;
+    const body = await request.json();
+    const { name, description, price, images, category, in_stock, is_active, sort_order } = body;
 
-  const product = await prisma.product.update({
-    where: { id: params.id },
-    data: {
-      ...(name !== undefined && { name }),
-      ...(description !== undefined && { description }),
-      ...(price !== undefined && { price: parseFloat(price) }),
-      ...(images !== undefined && { images }),
-      ...(category !== undefined && { category }),
-      ...(in_stock !== undefined && { in_stock }),
-      ...(is_active !== undefined && { is_active }),
-      ...(sort_order !== undefined && { sort_order }),
-    },
-  });
+    const product = await prisma.product.update({
+      where: { id: params.id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(price !== undefined && { price: parseFloat(price) }),
+        ...(images !== undefined && { images }),
+        ...(category !== undefined && { category }),
+        ...(in_stock !== undefined && { in_stock }),
+        ...(is_active !== undefined && { is_active }),
+        ...(sort_order !== undefined && { sort_order }),
+      },
+    });
 
-  return NextResponse.json(product);
+    return NextResponse.json(product);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getShopSession();
-  if (!session) return unauthorized();
+  try {
+    const session = await getShopSession();
+    if (!session) return unauthorized();
 
-  const existing = await prisma.product.findFirst({
-    where: { id: params.id, shop_id: session.shopId },
-  });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const existing = await prisma.product.findFirst({
+      where: { id: params.id, shop_id: session.shopId },
+    });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  await prisma.product.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
+    await prisma.product.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

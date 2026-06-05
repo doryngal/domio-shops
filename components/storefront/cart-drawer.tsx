@@ -7,9 +7,10 @@ interface CartDrawerProps {
   shopSlug: string;
   whatsappNumber: string;
   accentColor?: string;
+  whatsappTemplate?: string | null;
 }
 
-export function CartDrawer({ shopSlug, whatsappNumber, accentColor = "#C9A84C" }: CartDrawerProps) {
+export function CartDrawer({ shopSlug, whatsappNumber, accentColor = "#C9A84C", whatsappTemplate }: CartDrawerProps) {
   const { items, isOpen, setIsOpen, updateQuantity, removeItem, total, count, sessionId } = useCart();
 
   const handleWhatsApp = async () => {
@@ -18,7 +19,15 @@ export function CartDrawer({ shopSlug, whatsappNumber, accentColor = "#C9A84C" }
     const lines = items
       .map((i) => `• ${i.name} x${i.quantity} — ${formatPrice(i.price * i.quantity)} ₸`)
       .join("\n");
-    const message = `Привет! Хочу заказать:\n${lines}\nИтого: ${formatPrice(total)} ₸`;
+
+    let message: string;
+    if (whatsappTemplate) {
+      message = whatsappTemplate
+        .replace("{{items}}", lines)
+        .replace("{{total}}", `${formatPrice(total)} ₸`);
+    } else {
+      message = `Привет! Хочу заказать:\n${lines}\nИтого: ${formatPrice(total)} ₸`;
+    }
 
     // Log order event
     await fetch(`/api/storefront/${shopSlug}/events/order`, {

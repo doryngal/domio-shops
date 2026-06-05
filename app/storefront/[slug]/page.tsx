@@ -14,6 +14,7 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
       whatsapp_number: true,
       instagram_url: true,
       theme: true,
+      whatsapp_template: true,
       status: true,
     },
   });
@@ -33,7 +34,7 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
 
   return (
     <StorefrontClient
-      shop={{ ...shop, theme }}
+      shop={{ ...shop, theme, whatsapp_template: shop.whatsapp_template ?? null }}
       initialProducts={products.map((p) => ({
         ...p,
         price: parseFloat(p.price.toString()),
