@@ -27,6 +27,10 @@ export default auth(async function middleware(request: NextAuthRequest) {
 
   // ── Shop portal ────────────────────────────────────────────────────
   if (subdomain === "shop") {
+    // founder landed here after login redirect — let it through
+    if (pathname.startsWith("/founder/")) {
+      return NextResponse.next();
+    }
     if (!pathname.startsWith("/shop/login") && !pathname.startsWith("/api/")) {
       if (!session) {
         url.pathname = "/shop/login";
