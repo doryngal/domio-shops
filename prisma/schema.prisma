@@ -49,6 +49,7 @@ model Product {
   in_stock    Boolean  @default(true)
   is_active   Boolean  @default(true)
   sort_order  Int      @default(0)
+  options     Json     @default("[]")
   created_at  DateTime @default(now())
   shop        Shop     @relation(fields: [shop_id], references: [id])
 }

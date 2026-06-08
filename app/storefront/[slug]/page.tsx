@@ -38,6 +38,7 @@ export default async function StorefrontPage({ params }: { params: { slug: strin
       initialProducts={products.map((p) => ({
         ...p,
         price: parseFloat(p.price.toString()),
+        options: (p.options as any[]) || [],
       }))}
       categories={categories}
     />

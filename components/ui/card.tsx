@@ -24,13 +24,17 @@ export function StatCard({
   icon?: React.ReactNode;
 }) {
   return (
-    <Card className="flex flex-col gap-2">
+    <Card className="flex flex-col gap-2 p-4 md:p-6">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-[#888880]">{label}</span>
-        {icon && <span className="text-[#C9A84C]">{icon}</span>}
+        <span className="text-xs md:text-sm text-[#888880] leading-tight">{label}</span>
+        {icon && (
+          <span className="text-[#C9A84C] w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-xl bg-[#C9A84C]/10 flex-shrink-0">
+            {icon}
+          </span>
+        )}
       </div>
-      <span className="text-3xl font-bold text-[#f5f0e8]">{value}</span>
-      {sub && <span className="text-xs text-[#888880]">{sub}</span>}
+      <span className="text-2xl md:text-3xl font-bold text-[#f5f0e8] tabular-nums">{value}</span>
+      {sub && <span className="text-[10px] md:text-xs text-[#888880]">{sub}</span>}
     </Card>
   );
 }

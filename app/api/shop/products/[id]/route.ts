@@ -35,24 +35,26 @@ export async function PUT(
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const body = await request.json();
-    const { name, description, price, images, category, in_stock, is_active, sort_order } = body;
+    const { name, description, price, images, category, in_stock, is_active, sort_order, options } = body;
 
     const product = await prisma.product.update({
       where: { id: params.id },
       data: {
         ...(name !== undefined && { name }),
         ...(description !== undefined && { description }),
-        ...(price !== undefined && { price: parseFloat(price) }),
+        ...(price !== undefined && { price: parseFloat(String(price)) }),
         ...(images !== undefined && { images }),
         ...(category !== undefined && { category }),
         ...(in_stock !== undefined && { in_stock }),
         ...(is_active !== undefined && { is_active }),
         ...(sort_order !== undefined && { sort_order }),
+        ...(options !== undefined && { options }),
       },
     });
 
     return NextResponse.json(product);
-  } catch {
+  } catch (e) {
+    console.error("[PUT /api/shop/products/:id]", e);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

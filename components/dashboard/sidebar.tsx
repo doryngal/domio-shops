@@ -25,57 +25,102 @@ interface SidebarProps {
   logoHref?: string;
 }
 
+function isActive(pathname: string, href: string) {
+  return (
+    pathname === href ||
+    (href !== "/shop/dashboard" &&
+      href !== "/founder/dashboard" &&
+      pathname.startsWith(href + "/"))
+  );
+}
+
 export function Sidebar({ items, shopName, logoHref = "/" }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-[#141414] border-r border-[#2a2a2a] flex flex-col h-full">
-      {/* Logo */}
-      <div className="p-6 border-b border-[#2a2a2a]">
-        <Link href={logoHref} className="flex items-center gap-2">
-          <span className="text-[#C9A84C] font-bold text-xl">Domio</span>
-          <span className="text-[#f5f0e8] font-bold text-xl">Shops</span>
-        </Link>
-        {shopName && (
-          <p className="text-xs text-[#888880] mt-1 truncate">{shopName}</p>
-        )}
-      </div>
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex w-64 flex-shrink-0 bg-[#141414] border-r border-[#2a2a2a] flex-col h-full">
+        {/* Logo */}
+        <div className="p-6 border-b border-[#2a2a2a]">
+          <Link href={logoHref} className="flex items-center gap-2">
+            <span className="text-[#C9A84C] font-bold text-xl">Domio</span>
+            <span className="text-[#f5f0e8] font-bold text-xl">Shops</span>
+          </Link>
+          {shopName && (
+            <p className="text-xs text-[#888880] mt-1 truncate">{shopName}</p>
+          )}
+        </div>
 
-      {/* Nav */}
-      <nav className="flex-1 p-4 space-y-1">
+        {/* Nav */}
+        <nav className="flex-1 p-4 space-y-1">
+          {items.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer",
+                  active
+                    ? "bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/20"
+                    : "text-[#888880] hover:text-[#f5f0e8] hover:bg-[#1a1a1a]"
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout */}
+        <div className="p-4 border-t border-[#2a2a2a]">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#888880] hover:text-red-400 hover:bg-red-500/10 w-full transition-colors cursor-pointer"
+          >
+            <LogOut size={18} />
+            Выйти
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile bottom navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#141414]/95 backdrop-blur-xl border-t border-[#2a2a2a] flex items-stretch safe-area-bottom">
         {items.map((item) => {
-          const active =
-            pathname === item.href ||
-            pathname.startsWith(item.href + "/");
+          const active = isActive(pathname, item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer",
-                active
-                  ? "bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/20"
-                  : "text-[#888880] hover:text-[#f5f0e8] hover:bg-[#1a1a1a]"
+                "flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-all duration-150 cursor-pointer touch-manipulation",
+                active ? "text-[#C9A84C]" : "text-[#555550]"
               )}
             >
-              {item.icon}
-              {item.label}
+              <span className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150",
+                active ? "bg-[#C9A84C]/15" : ""
+              )}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] font-medium leading-none">{item.label}</span>
             </Link>
           );
         })}
-      </nav>
-
-      {/* Logout */}
-      <div className="p-4 border-t border-[#2a2a2a]">
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#888880] hover:text-red-400 hover:bg-red-500/10 w-full transition-colors cursor-pointer"
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] text-[#555550] hover:text-red-400 transition-colors cursor-pointer touch-manipulation"
+          aria-label="Выйти"
         >
-          <LogOut size={18} />
-          Выйти
+          <span className="flex items-center justify-center w-8 h-8 rounded-xl">
+            <LogOut size={18} />
+          </span>
+          <span className="text-[10px] font-medium leading-none">Выйти</span>
         </button>
-      </div>
-    </aside>
+      </nav>
+    </>
   );
 }
 

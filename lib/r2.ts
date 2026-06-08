@@ -1,39 +1,40 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-export const r2Client = new S3Client({
+export const s3Client = new S3Client({
   region: "auto",
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: process.env.S3_ENDPOINT || "",
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+    accessKeyId: process.env.S3_ACCESS_KEY || "",
+    secretAccessKey: process.env.S3_SECRET_KEY || "",
   },
 });
 
-export async function uploadToR2(
+const BUCKET = process.env.S3_BUCKET || "domino-storage";
+const PUBLIC_URL = process.env.S3_PUBLIC_URL || "";
+
+export async function uploadToS3(
   key: string,
   body: Buffer,
   contentType: string
 ): Promise<string> {
-  await r2Client.send(
+  await s3Client.send(
     new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME || "domio-shops",
+      Bucket: BUCKET,
       Key: key,
       Body: body,
       ContentType: contentType,
     })
   );
-  return `${process.env.R2_PUBLIC_URL}/${key}`;
+  return `${PUBLIC_URL}/${key}`;
 }
 
-export async function getPresignedUploadUrl(
-  key: string,
-  contentType: string
-): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME || "domio-shops",
-    Key: key,
-    ContentType: contentType,
-  });
-  return getSignedUrl(r2Client, command, { expiresIn: 3600 });
+export async function deleteFromS3(key: string): Promise<void> {
+  await s3Client.send(
+    new DeleteObjectCommand({ Bucket: BUCKET, Key: key })
+  );
+}
+
+export function keyFromUrl(url: string): string | null {
+  if (!url.startsWith(PUBLIC_URL)) return null;
+  return url.slice(PUBLIC_URL.length + 1);
 }

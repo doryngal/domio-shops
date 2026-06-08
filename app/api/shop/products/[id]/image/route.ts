@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getShopSession, unauthorized } from "@/lib/session";
-import { getPresignedUploadUrl } from "@/lib/r2";
+import { uploadToS3 } from "@/lib/r2";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(
@@ -22,13 +22,5 @@ export async function POST(
     return NextResponse.json({ error: "filename and contentType are required" }, { status: 400 });
   }
 
-  const key = `shops/${session.shopId}/products/${params.id}/${Date.now()}-${filename}`;
-
-  try {
-    const uploadUrl = await getPresignedUploadUrl(key, contentType);
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
-    return NextResponse.json({ uploadUrl, publicUrl, key });
-  } catch {
-    return NextResponse.json({ error: "Failed to generate upload URL" }, { status: 500 });
-  }
+  return NextResponse.json({ error: "Use /api/shop/upload instead" }, { status: 410 });
 }

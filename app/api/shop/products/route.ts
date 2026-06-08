@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     if (!session) return unauthorized();
 
     const body = await request.json();
-    const { name, description, price, images, category, in_stock, is_active, sort_order } = body;
+    const { name, description, price, images, category, in_stock, is_active, sort_order, options } = body;
 
     if (!name || !price) {
       return NextResponse.json({ error: "Name and price are required" }, { status: 400 });
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         in_stock: in_stock ?? true,
         is_active: is_active ?? true,
         sort_order: sort_order || 0,
+        options: options || [],
       },
     });
 

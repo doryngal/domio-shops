@@ -16,6 +16,11 @@ export async function GET(_request: NextRequest) {
   }
 }
 
+const RESERVED_SLUGS = [
+  "dashboard", "orders", "analytics", "settings", "products",
+  "login", "logout", "api", "admin", "founder", "shop", "storefront",
+];
+
 export async function PUT(request: NextRequest) {
   try {
     const session = await getShopSession();
@@ -32,6 +37,10 @@ export async function PUT(request: NextRequest) {
       whatsapp_template,
       custom_domain,
     } = body;
+
+    if (body.slug && RESERVED_SLUGS.includes(body.slug)) {
+      return NextResponse.json({ error: "Этот slug зарезервирован" }, { status: 400 });
+    }
 
     const shop = await prisma.shop.update({
       where: { id: session.shopId },
