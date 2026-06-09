@@ -29,7 +29,15 @@ export async function middleware(request: NextRequest) {
       : host.replace(/\.localhost(:\d+)?$/, "");
     if (slug && slug !== "www") {
       const url = request.nextUrl.clone();
-      url.pathname = `/storefront/${slug}${pathname === "/" ? "" : pathname}`;
+      if (pathname.startsWith("/api/")) {
+        // Rewrite /api/storefront/events/view → /api/storefront/{slug}/events/view
+        // But if it already contains the slug, pass through as-is
+        if (!pathname.startsWith(`/api/storefront/${slug}`)) {
+          url.pathname = pathname.replace("/api/", `/api/storefront/${slug}/`);
+        }
+      } else {
+        url.pathname = `/storefront/${slug}${pathname === "/" ? "" : pathname}`;
+      }
       return NextResponse.rewrite(url);
     }
   }
