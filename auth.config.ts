@@ -12,6 +12,19 @@ export const authConfig = {
   // Providers are added in lib/auth.ts (Credentials uses Prisma → Node.js only)
   providers: [],
   callbacks: {
+    authorized({ request, auth }) {
+      const host       = request.headers.get("host") || "";
+      const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "domio.top";
+      const isShop     = host === `shop.${rootDomain}` || host === "shop.localhost";
+      const isFounder  = host === `founder.${rootDomain}` || host === "founder.localhost";
+      const isMainDomain = host === rootDomain || host === "localhost";
+      const isStorefront = !isShop && !isFounder && !isMainDomain &&
+                           (host.endsWith(`.${rootDomain}`) || host.endsWith(".localhost"));
+      // Storefronts are public — always allow, our middleware handles the rewrite
+      if (isStorefront) return true;
+      // Everything else — our middleware handles auth checks, so allow here
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
         token.userId   = user.id;
