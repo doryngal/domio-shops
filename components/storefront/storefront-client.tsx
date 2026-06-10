@@ -38,7 +38,7 @@ interface StorefrontClientProps {
 }
 
 function MobileCartIsland({ accentColor }: { accentColor: string }) {
-  const { count, total, setIsOpen } = useCart();
+  const { count, total, setIsOpen, isOpen } = useCart();
   const [prevCount, setPrevCount] = useState(0);
   const [bump, setBump] = useState(false);
 
@@ -52,7 +52,13 @@ function MobileCartIsland({ accentColor }: { accentColor: string }) {
 
   if (count === 0) return null;
   return (
-    <div className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
+    <div
+      className={`md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+        isOpen
+          ? "opacity-0 pointer-events-none translate-y-4"
+          : "opacity-100 pointer-events-auto translate-y-0 animate-fade-up"
+      }`}
+    >
       <button
         onClick={() => setIsOpen(true)}
         className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl text-[#0d0d0d] font-semibold text-sm cursor-pointer transition-transform duration-150 active:scale-95 ${bump ? "scale-105" : "scale-100"}`}
